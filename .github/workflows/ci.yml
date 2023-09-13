@@ -11,9 +11,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  packages: write
-
 env:
   TIMEOUT: '-1'    # nbconvert timeout
   EXTRA_ARGS: ''   # Extra arguments for nbconvert
@@ -125,21 +122,18 @@ jobs:
         working-directory: out
       - name: Copy back built notebooks
         run: cp --verbose -rf out/docs/* docs/
-      - name: Setup micromamba
-        uses: mamba-org/setup-micromamba@v1
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Render Quarto Project
+        uses: quarto-dev/quarto-actions/render@v2
         with:
-          environment-file: jupyterbook.yml
-          init-shell: bash
-          cache-environment: true
-          post-cleanup: 'all'
-      - name: Build website
-        shell: micromamba-shell {0}
-        run: jupyter-book build docs/
-      - name: Upload pages artifact
-        if: ${{ github.ref == 'refs/heads/main' }}
+          to: html
+          path: docs/
+      - name: Upload artifact for GH pages
         uses: actions/upload-pages-artifact@v2
+        if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          path: docs/_build/html
+          path: _site
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT

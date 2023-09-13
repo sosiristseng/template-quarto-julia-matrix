@@ -1,0 +1,20 @@
+project:
+  type: website
+  output-dir: ../_site
+
+website:
+  title: "Julia and Quarto Template"
+  navbar:
+    search: true
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+      - plots.ipynb
+      - sub/plots.ipynb
+
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: true
