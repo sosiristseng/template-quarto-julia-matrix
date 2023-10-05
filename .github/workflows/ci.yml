@@ -148,12 +148,12 @@ jobs:
         uses: quarto-dev/quarto-actions/render@v2
         with:
           to: html
-          path: docs/
+          path: docs
       - name: Upload artifact for GH pages
         uses: actions/upload-pages-artifact@v2
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          path: _site
+          path: docs/_site
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT

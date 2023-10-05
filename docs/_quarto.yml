@@ -1,9 +1,8 @@
 project:
   type: website
-  output-dir: ../_site
 
 website:
-  title: "Julia and Quarto Template"
+  title: "Quarto Template for Julia Jupyter Notebooks"
   navbar:
     search: true
     left:
@@ -15,6 +14,6 @@ website:
 
 format:
   html:
-    theme: flatly
+    theme: cosmo
     css: styles.css
     toc: true
