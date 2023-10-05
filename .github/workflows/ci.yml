@@ -67,15 +67,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Get notebook path
-        id: file
-        run: echo "name=docs/${{ matrix.notebook }}" >> "$GITHUB_OUTPUT"
       - name: Restore notebook if present
         uses: actions/cache/restore@v3
         id: cache
         with:
-          path: ${{ steps.file.outputs.name }}
-          key: ${{ runner.os }}-notebook-${{ hashFiles(steps.file.outputs.name, 'requirements.txt', 'Manifest.toml', 'src/**') }}
+          path: docs/${{ matrix.notebook }}
+          key: ${{ runner.os }}-notebook-${{ hashFiles(format('docs/{0}', matrix.notebook), 'requirements.txt', 'Manifest.toml', 'src/**') }}
       - name: Setup Python
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         uses: actions/setup-python@v4
@@ -114,7 +111,7 @@ jobs:
         uses: actions/cache/save@v3
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         with:
-          path: ${{ steps.file.outputs.name }}
+          path: docs/${{ matrix.notebook }}
           key: ${{ steps.cache.outputs.cache-primary-key }}
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
