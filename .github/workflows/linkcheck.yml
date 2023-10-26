@@ -34,7 +34,7 @@ jobs:
       - name: Convert ipynb files to markdown
         run: |
           parallel -j2 jupyter nbconvert --to markdown {} ::: ${{ env.DIR }}/*.ipynb
-      - name: Rename QMD files to markdown
+      - name: Rename qmd files to markdown
         run: mmv ';*.qmd' '#1.md'
       - name: Restore lychee cache
         id: restore-cache
