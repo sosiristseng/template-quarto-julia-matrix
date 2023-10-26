@@ -14,6 +14,7 @@ concurrency:
 env:
   TIMEOUT: '-1'    # nbconvert timeout
   EXTRA_ARGS: ''   # Extra arguments for nbconvert
+  PYTHON_VER: '3.11'
 
 jobs:
   setup:
