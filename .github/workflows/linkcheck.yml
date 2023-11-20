@@ -23,13 +23,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Setup micromamba
+        uses: mamba-org/setup-micromamba@v1
         with:
-          python-version: '3.x'
-      - name: Install NBConvert
-        run: pip install nbconvert
+          environment-file: environment.yml
+          cache-environment: true
+          post-cleanup: all
       - name: Convert ipynb files to markdown
+        shell: micromamba-shell {0}
         run: |
           parallel -j2 jupyter nbconvert --to markdown {} ::: ${{ env.DIR }}/*.ipynb
       - name: Restore lychee cache
