@@ -150,7 +150,7 @@ jobs:
           path: docs/${{ matrix.notebook }}
           key: ${{ steps.cache.outputs.cache-primary-key }}
       - name: Upload Notebook
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: notebooks
           path: docs*/${{ matrix.notebook }}  # keep folder structure
