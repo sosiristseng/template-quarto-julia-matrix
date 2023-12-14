@@ -38,8 +38,9 @@ jobs:
         if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
         run: pip install -r requirements.txt
       - name: Convert ipynb files to markdown
-        run: |
-          parallel -j2 jupyter nbconvert --to markdown {} ::: ${{ env.DIR }}/*.ipynb
+        run: >
+          find ${{ env.DIR }} -type f -name '*.ipynb' |
+          parallel -j2 jupyter nbconvert --to markdown {}
       - name: Restore lychee cache
         id: restore-cache
         uses: actions/cache/restore@v3
@@ -52,7 +53,7 @@ jobs:
         id: lychee
         with:
           fail: true
-          args: --accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "${{env.DIR}}/**/*.md" "${{env.DIR}}/**/*.qmd"
+          args: --accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "${{ env.DIR }}/**/*.md" "${{ env.DIR }}/**/*.qmd"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Save lychee cache
