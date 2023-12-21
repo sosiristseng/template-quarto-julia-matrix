@@ -102,15 +102,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download notebooks
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: notebooks
           path: out/
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: out
       - name: Copy back built notebooks
-        run: cp --verbose -rf out/docs/* docs/
+        run: for d in out/notebook-*; do cp --verbose -rf "$d"/docs/* docs/; done
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
       - name: Render Quarto Project
