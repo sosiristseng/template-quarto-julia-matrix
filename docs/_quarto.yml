@@ -18,5 +18,4 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
-  ipynb: default
-format-links: [ipynb]
+    html-math-method: katex
