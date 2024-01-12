@@ -19,3 +19,4 @@ format:
     css: styles.css
     toc: true
   ipynb: default
+format-links: [ipynb]
