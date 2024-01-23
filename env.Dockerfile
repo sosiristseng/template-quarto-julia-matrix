@@ -1,5 +1,4 @@
-ARG JLVER=1
-FROM julia:${JLVER} as julia
+FROM julia:1.10.0 as julia
 FROM python:3.12.1-slim as base
 
 # Julia config
@@ -18,9 +17,9 @@ WORKDIR /work
 
 # Python dependencies. e.g. matplotlib
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir nbconvert -r requirements.txt
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
 COPY src/ src
-RUN julia --color=yes -e 'using Pkg; Pkg.add(["IJulia"]); Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'
+RUN julia --color=yes -e 'using Pkg; Pkg.add(["IJulia"]); import IJulia; IJulia.installkernel("Julia", "--project=@."); Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'

@@ -28,27 +28,21 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PY_VER }}
-      - name: Cache pip
-        uses: actions/cache@v4
-        id: cache-pip
-        with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
       - name: Install python packages
-        if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
-        run: pip install -r requirements.txt
+        run: pip install nbconvert
       - name: Convert ipynb files to markdown
         run: >
           find ${{ env.DIR }} -type f -name '*.ipynb' |
           parallel -j2 jupyter nbconvert --to markdown {}
-      - name: Restore lychee cache
+      - name: Lychee cache
         id: restore-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
+          save-always: 'true'
           path: .lycheecache
           key: cache-lychee-${{ github.sha }}
           restore-keys: cache-lychee-
-      - name: Lychee Checker
+      - name: Lychee link check
         uses: lycheeverse/lychee-action@v1.9.1
         id: lychee
         with:
@@ -56,9 +50,3 @@ jobs:
           args: --accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "${{ env.DIR }}/**/*.md" "${{ env.DIR }}/**/*.qmd"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Save lychee cache
-        uses: actions/cache/save@v4
-        if: always()
-        with:
-          path: .lycheecache
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
