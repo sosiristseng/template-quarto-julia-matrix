@@ -6,7 +6,8 @@ website:
   title: "Quarto Julia Template"
   page-navigation: true
   back-to-top-navigation: true
-  reader-mode: true
+  navbar:
+    search: true
   sidebar:
     style: "docked"
     search: true
