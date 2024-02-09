@@ -33,7 +33,7 @@ jobs:
         password: ${{ github.token }}
     - name: Get docker image hash
       id: img
-      run: echo "hash=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', 'env.Dockerfile') }}" >> "$GITHUB_OUTPUT"
+      run: echo "hash=${{ hashFiles('requirements.txt', 'Manifest.toml', 'src/**', 'env.Dockerfile') }}" >> "$GITHUB_OUTPUT"
     - name: Build Docker container
       env:
         IMG: ghcr.io/${{ github.repository }}:${{ steps.img.outputs.hash }}
@@ -68,17 +68,19 @@ jobs:
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
         run: >
           docker run --rm -w /tmp -v ${{ github.workspace }}:/tmp
-          -e EXTRA_ARGS=${{ env.EXTRA_ARGS }}
-          -e NOTEBOOK=${{ matrix.notebook }}
           ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
-          bash ./execute.sh
+          jupyter nbconvert --to notebook --execute --inplace
+          ${{ env.EXTRA_ARGS }} \
+          --ExecutePreprocessor.timeout=-1 \
+          --ExecutePreprocessor.kernel_name=$(julia -e 'print("julia-1.",VERSION.minor)') \
+          docs/${{ matrix.notebook }}
       - name: Cache notebook
         uses: actions/cache/save@v4
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
         with:
           path: docs/${{ matrix.notebook }}
           key: ${{ steps.nb-cache.outputs.cache-primary-key }}
-      - name: Convert artifact Name
+      - name: Obtain artifact Name
         id: art
         run: echo "name=$(echo ${{ matrix.notebook }} | sed 's/\//-/g')" >> "$GITHUB_OUTPUT"
       - name: Upload Notebook
