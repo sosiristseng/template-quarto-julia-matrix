@@ -70,9 +70,9 @@ jobs:
           docker run --rm -w /tmp -v ${{ github.workspace }}:/tmp
           ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
           jupyter nbconvert --to notebook --execute --inplace
-          ${{ env.EXTRA_ARGS }} \
-          --ExecutePreprocessor.timeout=-1 \
-          --ExecutePreprocessor.kernel_name=$(julia -e 'print("julia-1.",VERSION.minor)') \
+          ${{ env.EXTRA_ARGS }}
+          --ExecutePreprocessor.timeout=-1
+          --ExecutePreprocessor.kernel_name=$(julia -e 'print("julia-1.",VERSION.minor)')
           docs/${{ matrix.notebook }}
       - name: Cache notebook
         uses: actions/cache/save@v4
