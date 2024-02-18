@@ -19,7 +19,6 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
-      PY_VER: '3.12'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,7 +26,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PY_VER }}
+          python-version: '3.x'
       - name: Install python packages
         run: pip install nbconvert
       - name: Convert ipynb files to markdown
