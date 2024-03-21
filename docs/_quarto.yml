@@ -10,7 +10,6 @@ website:
     search: true
   sidebar:
     style: "docked"
-    search: true
     contents: auto
 
 format:
