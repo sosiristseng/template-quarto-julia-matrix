@@ -9,43 +9,47 @@ on:
       - main
     paths:
       - 'docs/**'
+      - '.lycheeignore'
       - '.github/workflows/linkcheck.yml'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+env:
+  DIR: 'docs'
 
 jobs:
   linkcheck:
-    env:
-      DIR: 'docs'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+      - name: Convert literate notebooks to ipynb files
+        shell: julia --color=yes {0}
+        run: |
+          import Pkg
+          Pkg.add("Literate")
+          using Literate
+          for (root, dirs, files) in walkdir("docs")
+            for file in files
+              if endswith(file, ".jl")
+                nb = joinpath(root, file)
+                Literate.notebook(nb, dirname(nb); mdstrings=true, execute=false)
+              end
+            end
+          end
       - name: Setup Python
         uses: actions/setup-python@v5
+        id: cp
         with:
           python-version: '3.x'
-      - name: Install python packages
-        run: pip install nbconvert
-      - name: Convert ipynb files to markdown
-        run: >
-          find ${{ env.DIR }} -type f -name '*.ipynb' |
-          parallel -j2 jupyter nbconvert --to markdown {}
-      - name: Lychee cache
-        id: restore-cache
+      - name: Cache pip dependencies
         uses: actions/cache@v4
+        id: cache-py
         with:
-          save-always: 'true'
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-      - name: Lychee link check
-        uses: lycheeverse/lychee-action@v1.9.3
-        id: lychee
-        with:
-          fail: true
-          args: --accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "${{ env.DIR }}/**/*.md" "${{ env.DIR }}/**/*.qmd"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ env.pythonLocation }}
+          key:  ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements-jb.txt') }}
+      - name: Install pip dependencies if cache miss
+        if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
+        run: pip install -r requirements-jb.txt
+      - name: Check links
+        run: jb build ${DIR} --builder linkcheck
