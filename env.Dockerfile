@@ -1,4 +1,5 @@
-FROM julia:1.10.4 as julia
+FROM julia:1.10.5 as julia
+FROM ghcr.io/astral-sh/uv:latest as uv
 FROM python:3.12.5-slim
 
 # Julia config
@@ -10,12 +11,13 @@ ENV JULIA_PATH '/usr/local/julia/'
 ENV JULIA_DEPOT_PATH '/srv/juliapkg/'
 ENV PATH ${JULIA_PATH}/bin:${PATH}
 COPY --from=julia ${JULIA_PATH} ${JULIA_PATH}
+COPY --from=uv /uv /bin/uv
 
 WORKDIR /work
 
 # Python dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv pip install --no-cache-dir -r requirements.txt
 
 # Julia dependencies
 COPY Project.toml Manifest.toml ./

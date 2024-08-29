@@ -19,13 +19,14 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
+      UV_SYSTEM_PYTHON: 1
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
-      - name: Convert literate notebooks to markdown files
+      - name: Convert literate notebooks to ipynb files
         shell: julia --color=yes {0}
         working-directory: ${{ env.DIR }}
         run: |
@@ -36,33 +37,18 @@ jobs:
             for file in files
               if endswith(file, ".jl")
                 nb = joinpath(root, file)
-                Literate.markdown(nb, dirname(nb); mdstrings=true, flavor=Literate.CommonMarkFlavor())
+                Literate.notebook(nb, dirname(nb); mdstrings=true, execute=false)
               end
             end
           end
       - name: Setup Python
         uses: actions/setup-python@v5
+        id: setup-python
         with:
           python-version: '3.x'
-      - name: Install python packages
-        run: pip install nbconvert
-      - name: Convert ipynb files to markdown
-        run: >
-          find ${{ env.DIR }} -type f -name '*.ipynb' |
-          parallel -j2 jupyter nbconvert --to markdown {}
-      - name: Lychee cache
-        id: restore-cache
-        uses: actions/cache@v4
-        with:
-          save-always: 'true'
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-      - name: Lychee link check
-        uses: lycheeverse/lychee-action@v1.10.0
-        id: lychee
-        with:
-          fail: true
-          args: --accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "${{ env.DIR }}/**/*.md" "${{ env.DIR }}/**/*.qmd"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Install Python dependencies
+        run: uv pip install -r requirements-jb.txt
+      - name: Build website
+        run: jupyter-book build ${DIR} --builder linkcheck
