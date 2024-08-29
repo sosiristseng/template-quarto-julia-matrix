@@ -2,7 +2,7 @@ FROM julia:1.10.5 as julia
 FROM ghcr.io/astral-sh/uv:latest as uv
 FROM python:3.12.5-slim
 
-# Julia config
+ENV UV_SYSTEM_PYTHON '1'
 ENV JULIA_CI 'true'
 ENV JULIA_NUM_THREADS 'auto'
 # Let PythonCall use built-in python
