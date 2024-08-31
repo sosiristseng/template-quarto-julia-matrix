@@ -25,6 +25,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: '3.x'
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - name: Install Python dependencies
+        run: uv pip install nbconvert
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
       - name: Convert literate notebooks to markdown files
@@ -42,15 +51,6 @@ jobs:
               end
             end
           end
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        id: setup-python
-        with:
-          python-version: '3.x'
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      - name: Install Python dependencies
-        run: uv pip install nbconvert
       - name: Convert ipynb files to markdown
         run: >
           find ${{ env.DIR }} -type f -name '*.ipynb' |
