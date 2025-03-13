@@ -20,6 +20,7 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
+      UV_SYSTEM_PYTHON: 1
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,15 +42,17 @@ jobs:
               end
             end
           end
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
-        id: setup-python
         with:
           python-version: '3.x'
-      - name: Install Python dependencies
-        run: |
-          pip install uv
-          uv pip install --system nbconvert
+          check-latest: true
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+      - name: Install requirements
+        run: uv pip install nbconvert
       - name: Convert ipynb files to markdown
         run: >
           find ${{ env.DIR }} -type f -name '*.ipynb' |
