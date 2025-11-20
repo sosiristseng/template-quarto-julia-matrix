@@ -64,6 +64,7 @@ jobs:
         Pkg.add(["Literate", "JSON"])
         Pkg.activate(".")
         Pkg.instantiate()
+        using Literate
         Pkg.precompile()
         if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
             Pkg.gc(;collect_delay=Day(0))
