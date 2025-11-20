@@ -158,3 +158,5 @@ docs/site/
 # environment.
 # Manifest.toml
 LocalPreferences.toml
+
+.CondaPkg/
