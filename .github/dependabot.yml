@@ -9,12 +9,10 @@ updates:
         applies-to: "version-updates"
         patterns:
           - "*"
+    labels:
+      - automerge
   - package-ecosystem: pip
     directory: "/"
-    schedule:
-      interval: weekly
-  - package-ecosystem: docker
-    directory: "/.github"
     schedule:
       interval: weekly
     labels:
