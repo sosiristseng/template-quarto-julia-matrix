@@ -1,22 +1,41 @@
+# https://quarto.org/docs/projects/quarto-projects.html
 project:
-  type: website
+  type: book
   output-dir: ../_site
 
-website:
-  title: "Quarto Julia Template"
+# https://quarto.org/docs/books/
+book:
+  title: Quarto Julia Template
+  author: "Wen-Wei Tseng"
+  repo-url: https://github.com/sosiristseng/template-quarto-julia-matrix
+  site-url: https://sosiristseng.github.io/template-quarto-julia-matrix
   page-navigation: true
-  back-to-top-navigation: true
-  navbar:
-    search: true
-  sidebar:
-    style: "docked"
-    contents: auto
+  bread-crumbs: true
+  chapters:
+    - index.qmd
+    - plots.ipynb
+    - pythonplot.ipynb
+    - part: "Subdir"
+      chapters:
+        - sub/plots-lit.ipynb
+        - sub/plots.ipynb
+  appendices:
+    - about.qmd
 
+# bibliography: references.bib
+
+# https://quarto.org/docs/output-formats/html-basics.html
 format:
   html:
+    code-link: true
     theme:
-      light: flatly
-      dark: darkly
-    css: styles.css
-    toc: true
-    html-math-method: mathjax
+      light: cosmo
+      dark: cyborg
+
+# Default options
+# notebook-links: true
+
+# Execution
+# execute:
+#   cache: true
+# engines: ['julia']
