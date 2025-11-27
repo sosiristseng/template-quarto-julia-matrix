@@ -14,7 +14,7 @@ website:
     style: docked
     search: true
     contents:
-      - index.ipynb
+      - index.qmd
       - pythonplot.ipynb
       - pythonplot-lit.ipynb
       - section: "Subdir"
