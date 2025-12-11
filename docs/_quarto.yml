@@ -1,46 +1,51 @@
 # https://quarto.org/docs/projects/quarto-projects.html
 project:
   type: website
-  output-dir: ../_site
+  output-dir: _site
 
 # https://quarto.org/docs/websites/
 website:
   title: Quarto Julia Template
   page-navigation: true
+  bread-crumbs: true
   back-to-top-navigation: true
-  repo-url: https://github.com/sosiristseng/template-quarto-literate
-  site-url: https://sosiristseng.github.io/template-quarto-literate
+  repo-url: https://github.com/sosiristseng/template-quarto-julia-matrix
+  site-url: https://sosiristseng.github.io/template-quarto-julia-matrix
+  search:
+    show-item-context: true
+    type: overlay
   sidebar:
     style: docked
+    collapse-level: 2
+    align: left
     search: true
     contents:
-      - index.qmd
+      - index.ipynb
+      - symbolic.ipynb
       - pythonplot.ipynb
-      - pythonplot-lit.ipynb
       - section: "Subdir"
         contents:
           - sub/plots.ipynb
-          - sub/plots-lit.ipynb
       - about.qmd
     tools:
       - icon: github
-        href: https://github.com/sosiristseng/template-quarto-literate
+        href: https://github.com/sosiristseng/template-quarto-julia-matrix
 
 # bibliography: references.bib
 
 # https://quarto.org/docs/output-formats/html-basics.html
 format:
   html:
+    respect-user-color-scheme: true
     toc: true
-    theme:
-      light: cosmo
-      dark: darkly
+    theme: materia
+    code-copy: true
+    code-overflow: wrap
+    grid:
+      sidebar-width: 300px
+      body-width: 1000px
+      margin-width: 350px
+    # keep-md: true
     # css: styles.css
-
-# Default options
-# notebook-links: true
-
-# Execution
 # execute:
-#   cache: true
-# engines: ['julia']
+#   output: asis
