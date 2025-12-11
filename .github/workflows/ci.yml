@@ -151,15 +151,13 @@ jobs:
         run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
-      - name: Remove jl files to avoid confusion with jupytext
-        run: find docs/ -type f -name "*.jl" -delete
       - name: Render Quarto Project
         run: quarto render docs --to html
       - name: Upload artifact for GH pages
         uses: actions/upload-pages-artifact@v4
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          path: _site/
+          path: docs/_site/
 
   # CI conclusion for GitHub status check
   # Adaped from https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
