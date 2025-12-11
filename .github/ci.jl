@@ -14,6 +14,7 @@ function main(;
     execute = ifelse(get(ENV, "ALLOWERRORS", "false") == "true", "--execute --allow-errors", "--execute")
     timeout = "--ExecutePreprocessor.timeout=" * get(ENV, "TIMEOUT", "-1")
     nbout = joinpath(abspath(pwd()), cachedir, nb)
+    mkpath(dirname(nbout))
     cmd = `jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(nbout) $(nb)`
     run(cmd)
     rmsvg && strip_svg(nbout)
