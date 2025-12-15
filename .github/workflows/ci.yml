@@ -50,7 +50,7 @@ jobs:
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
         echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
     - name: Cache Julia packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: cache-julia
       with:
         path: ~/.julia
@@ -93,7 +93,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Cache notebook
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: nb-cache
         with:
           path: ${{ env.NBCACHE }}
@@ -117,7 +117,7 @@ jobs:
           version: ${{ needs.setup.outputs.ver }}
           arch: ${{ runner.arch }}
       - name: Restore Julia packages
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
         with:
           path: ~/.julia
@@ -129,7 +129,7 @@ jobs:
         id: art
         run: echo "name=$(echo ${{ env.NB }} | sed 's/\//-/g')" >> "$GITHUB_OUTPUT"
       - name: Upload Notebook
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: notebook-${{ steps.art.outputs.name }}-${{ needs.setup.outputs.hash }}-${{ hashFiles(env.NB) }}
           path: ${{ env.NBCACHE }}
@@ -143,7 +143,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download notebooks
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ${{ env.NBCACHE }}/
           pattern: notebook-*
