@@ -12,15 +12,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCACHE: ".cache"
+  JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_CI: 'true'
   JULIA_NUM_THREADS: 'auto'
-  TIMEOUT: '600'
-  ALLOWERRORS: 'false'
-  PY_VER: '3.13'
+  NBCACHE: '.cache'
+  PY_VER: '3.14'
+
 
 jobs:
   setup:
@@ -68,8 +67,6 @@ jobs:
       shell: julia --color=yes {0}
       run: |
         using Pkg, Dates
-        Pkg.add(["IJulia", "JSON"])
-        Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
         if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
@@ -149,7 +146,9 @@ jobs:
           pattern: notebook-*
           merge-multiple: true
       - name: Copy back built notebooks
-        run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
+        run: |
+          cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
+          find docs/ -type f -name "*.jl" -delete
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
       - name: Render Quarto Project
