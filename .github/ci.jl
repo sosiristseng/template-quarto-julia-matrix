@@ -6,16 +6,12 @@ ENV["GKSwstype"] = "100"
 function main(; dopostproc=true)
     file = get(ENV, "NB", "test.ipynb")
     cachedir = get(ENV, "NBCACHE", ".cache")
-    nb = if endswith(file, ".jl")
-        run_literate(file; cachedir)
+    if endswith(file, ".jl")
+        run_literate(file; cachedir, dopostproc)
     elseif endswith(file, ".ipynb")
         lit = to_literate(file)
-        run_literate(lit; cachedir)
-    else
-        error("$(file) is not a valid notebook file!")
+        run_literate(lit; cachedir, dopostproc)
     end
-    dopostproc && postprocess(nb)
-    return nothing
 end
 
 # Post-process Jupyter notebook
@@ -43,7 +39,7 @@ function postprocess(ipynb)
     end
     rm(ipynb; force=true)
     write(ipynb, JSON.json(nb, 2))
-    @info "Stripped SVG in $(ipynb). The original size is $(Base.format_bytes(oldfilesize)). The new size is $(Base.format_bytes(filesize(ipynb)))."
+    @info "The original size is $(Base.format_bytes(oldfilesize)). The new size is $(Base.format_bytes(filesize(ipynb)))."
     return ipynb
 end
 
@@ -70,10 +66,11 @@ function to_literate(nbpath; shell_or_help = r"^\s*[;?]")
     return jlpath
 end
 
-function run_literate(file; cachedir = ".cache")
+function run_literate(file; cachedir = ".cache", dopostproc=true)
     outpath = joinpath(abspath(pwd()), cachedir, dirname(file))
     mkpath(outpath)
     ipynb = Literate.notebook(file, dirname(file); mdstrings=true, execute=true)
+    dopostproc && postprocess(ipynb)
     cp(ipynb, joinpath(outpath, basename(ipynb)); force=true)
     return ipynb
 end
