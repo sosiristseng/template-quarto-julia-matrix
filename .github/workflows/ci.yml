@@ -62,7 +62,7 @@ jobs:
       shell: julia --color=yes {0}
       run: |
         using Pkg, Dates
-        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
+        Pkg.add(["JSON", "Literate"])
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.resolve()
@@ -107,6 +107,8 @@ jobs:
           key: ${{ runner.os }}-julia-${{ needs.setup.outputs.ver }}-${{ needs.setup.outputs.hash }}
       - name: Execute notebook
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
+        env:
+          JULIA_CONDAPKG_OFFLINE: true
         run: julia --project=@. .github/ci.jl
       - name: Convert artifact Name
         id: art
