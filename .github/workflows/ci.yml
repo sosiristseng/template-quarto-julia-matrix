@@ -13,13 +13,12 @@ concurrency:
 
 env:
   JULIA_CI: 'true'
-  JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_CONDAPKG_OFFLINE: 'true'
+  JULIA_CONDAPKG_ENV: '@jlpy'
   JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   JULIA_NUM_THREADS: 'auto'
+  OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
   PY_VER: '3.14'
-
 
 jobs:
   setup:
@@ -36,10 +35,6 @@ jobs:
       id: setup-python
       with:
         python-version: ${{ env.PY_VER }}
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@v7
-    - name: Install Python dependencies
-      run: uv pip install --system -r requirements.txt
     - name: Read Julia version
       id: julia-version
       run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
@@ -64,12 +59,17 @@ jobs:
         arch: ${{ runner.arch }}
     - name: Install Julia packages
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
-      shell: julia --color=yes --project=@. {0}
+      shell: julia --color=yes {0}
       run: |
         using Pkg, Dates
+        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
+        Pkg.activate(".")
         Pkg.instantiate()
+        Pkg.resolve()
         Pkg.precompile()
-        Pkg.gc(;collect_delay=Day(0))
+        if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
+            Pkg.gc(;collect_delay=Day(0))
+        end
     - name: List notebooks as a JSON array
       id: set-matrix
       run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**/*.ipynb", root_dir="docs", recursive=True) + glob.glob("**/*.jl", root_dir="docs", recursive=True)))')" >> "$GITHUB_OUTPUT"
@@ -93,18 +93,6 @@ jobs:
         with:
           path: ${{ env.NBCACHE }}
           key: notebook-${{ needs.setup.outputs.hash }}-${{ hashFiles(env.NB) }}
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
-        id: setup-python
-        with:
-          python-version: ${{ env.PY_VER }}
-      - name: Install the latest version of uv
-        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
-        uses: astral-sh/setup-uv@v7
-      - name: Install Python dependencies
-        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
-        run: uv pip install --system -r requirements.txt
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
