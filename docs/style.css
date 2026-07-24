@@ -1,4 +1,3 @@
-/* css styles */
-.sidebar, .sidebar-navigation {
-  font-size: 1.2rem;
+#quarto-sidebar, .sidebar-navigation, .sidebarItem {
+  font-size: 1.15rem; /* Increase text size */
 }
