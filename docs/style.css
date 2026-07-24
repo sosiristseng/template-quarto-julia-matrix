@@ -1,1 +1,4 @@
 /* css styles */
+.sidebar, .sidebar-navigation {
+  font-size: 1.2rem;
+}
