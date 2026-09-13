@@ -1,3 +1,6 @@
+[workspace]
+projects = ["Startup"]
+
 [deps]
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
@@ -5,5 +8,5 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PythonPlot = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"
 Startup = "cd038ea3-df26-4edf-97c6-5148c252d028"
 
-[workspace]
-projects = ["Startup"]
+[sources]
+Startup = {path = "Startup"}
