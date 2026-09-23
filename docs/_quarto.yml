@@ -9,13 +9,14 @@ website:
   page-navigation: true
   bread-crumbs: true
   back-to-top-navigation: true
+  reader-mode: true
   repo-url: https://github.com/sosiristseng/template-quarto-julia-matrix
   site-url: https://sosiristseng.github.io/template-quarto-julia-matrix
   search:
     show-item-context: true
     type: overlay
   navbar:
-    background: primary
+    search: true
     left:
       - href: index.ipynb
         text: Home
@@ -24,10 +25,10 @@ website:
       - icon: github
         href: https://github.com/sosiristseng/template-quarto-julia-matrix
   sidebar:
-    style: "docked"
-    search: true
+    title: false
+    style: docked
     collapse-level: 2
-    align: left
+    alignment: left
     contents:
       - index.ipynb
       - pythonplot.ipynb
@@ -41,13 +42,14 @@ website:
 # bibliography: references.bib
 
 # https://quarto.org/docs/output-formats/html-basics.html
+# https://quarto.org/docs/output-formats/html-themes.html
 format:
   html:
     respect-user-color-scheme: true
     toc: true
-    theme:
-      light: cosmo
-      dark: cosmo
+    theme: cosmo
+    fontsize: 1.1em
+    linestretch: 1.7
     code-copy: true
     code-overflow: wrap
     grid:
