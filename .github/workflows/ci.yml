@@ -15,10 +15,11 @@ env:
   CACHE_NUM: '1'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
+  JULIA_CPU_TARGET: 'generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  JULIA_CONDAPKG_ENV: '@mpl'
+  JULIA_CONDAPKG_OFFLINE: 'true'
+  JULIA_CONDAPKG_BACKEND: 'Null'
 
 jobs:
   setup:
@@ -59,7 +60,7 @@ jobs:
           ${{ steps.hash.outputs.jl }}-
     - name: Install Julia packages
       shell: julia --color=yes --project=@. {0}
-      run: using Pkg; Pkg.instantiate()
+      run: using Pkg; Pkg.instantiate(); Pkg.precompile()
     - name: List notebooks as a JSON array
       id: set-matrix
       run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**/*.ipynb", root_dir="docs", recursive=True) + glob.glob("**/*.jl", root_dir="docs", recursive=True)))')" >> "$GITHUB_OUTPUT"
@@ -83,6 +84,15 @@ jobs:
         with:
           path: ${{ env.NBCACHE }}
           key: notebook-${{ needs.setup.outputs.env }}-${{ hashFiles(env.NB) }}
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
+        id: setup-python
+        with:
+          python-version: 3.x
+      - name: Install Python packages
+        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
+        run: pip install -r requirements.txt
       - name: Setup Julia
         uses: julia-actions/setup-julia@v3
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
@@ -127,8 +137,8 @@ jobs:
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
       - name: Render Quarto Project
-        run: quarto render docs --to html
-      - name: Upload artifact for GH pages
+        run: quarto render docs/ --to html
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v5
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
