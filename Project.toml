@@ -10,3 +10,6 @@ Startup = "cd038ea3-df26-4edf-97c6-5148c252d028"
 
 [sources]
 Startup = {path = "Startup"}
+
+[compat]
+julia = "1.13"

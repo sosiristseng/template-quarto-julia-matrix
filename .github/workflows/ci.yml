@@ -15,11 +15,9 @@ env:
   CACHE_NUM: '1'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CPU_TARGET: 'generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1)'
+  JULIA_CPU_TARGET: 'sysimage'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  JULIA_CONDAPKG_OFFLINE: 'true'
-  JULIA_CONDAPKG_BACKEND: 'Null'
 
 jobs:
   setup:
@@ -32,14 +30,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
-    - name: Setup Python
-      uses: actions/setup-python@v7
-      id: setup-python
-      with:
-        python-version: 3.x
     - name: Read Julia version
       id: julia-version
-      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
+      run: echo "resolved=$(awk -F '"' '/^[[:space:]]*julia_version/ {print $2}' Manifest.toml)" >> "$GITHUB_OUTPUT"
     - name: Set outputs for downstream jobs
       id: hash
       run: |
@@ -84,17 +77,6 @@ jobs:
         with:
           path: ${{ env.NBCACHE }}
           key: notebook-${{ needs.setup.outputs.env }}-${{ hashFiles(env.NB) }}
-      - name: Setup Python
-        uses: actions/setup-python@v7
-        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
-        id: setup-python
-        with:
-          python-version: 3.x
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
-      - name: Install Python packages
-        if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
-        run: uv pip install --system -r requirements.txt
       - name: Setup Julia
         uses: julia-actions/setup-julia@v3
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
